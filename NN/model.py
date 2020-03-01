@@ -26,26 +26,26 @@ class NN():
             self.sx * np.identity(self.M)).pdf(x) * stats.multivariate_normal(
                 self.R(x, a, b), self.s * np.identity(self.N)).pdf(y)
 
-    def sampling(self, X, Y, size=100, burn=10):
+    def sampling(self, X, Y, size=200, burn=10):
         XY = [(X[i], Y[i]) for i, _ in enumerate(X)]
         sample = []
         accept, reject = 0, 0
-        a0 = np.random.normal(0, 1, (self.H, self.N))
-        b0 = np.random.normal(0, 1, (self.H, self.M))
+        a0 = np.random.normal(0, 0.5, (self.H, self.N))
+        b0 = np.random.normal(0, 0.5, (self.H, self.M))
         while accept < size:
             a1 = np.array(
-                [[np.random.normal(a0[h][n], 0.05) for n in range(self.N)]
+                [[np.random.normal(a0[h][n], 1) for n in range(self.N)]
                  for h in range(self.H)])
             b1 = np.array(
-                [[np.random.normal(b0[h][m], 0.05) for m in range(self.M)]
+                [[np.random.normal(b0[h][m], 1) for m in range(self.M)]
                  for h in range(self.H)])
             u = np.random.random()
-            P = np.exp(((a0**2 - a1**2).sum() +
-                        (b0**2 - b1**2).sum()) / (2 * self.s0**2) +
-                       sum([((y - self.R(x, a0, b0))**2 -
-                             (y - self.R(x, a1, b1))**2).sum()
-                            for x, y in XY]) / (2 * self.s**2))
-            P = min(1, P)
+            th = ((a0**2 - a1**2).sum() +
+                  (b0**2 - b1**2).sum()) / (2 * self.s0**2) + sum([
+                      ((y - self.R(x, a0, b0))**2 -
+                       (y - self.R(x, a1, b1))**2).sum() for x, y in XY
+                  ]) / (2 * self.s**2)
+            P = np.exp(max(-100, min(th, 100)))
             if u < P:
                 a0, b0 = a1, b1
                 accept += 1

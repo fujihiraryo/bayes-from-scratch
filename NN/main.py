@@ -2,10 +2,10 @@ import model
 import numpy as np
 
 # 設定
-M, H0, N = 3, 1, 2
+M, H0, N = 3, 3, 2
 H = 3
-n = 100
-T = 100
+n = 50
+T = 1
 a0 = np.random.normal(0, 1, (H0, N))
 b0 = np.random.normal(0, 1, (H0, M))
 
@@ -17,8 +17,7 @@ def p(x, y):
 
 # 予測関数
 def R(x):
-    return np.array(
-        [np.mean([nn.R(x, a, b)[j] for a, b in params]) for j in range(N)])
+    return np.mean([nn.R(x, a, b) for a, b in params], axis=0)
 
 
 # 独立した実験をT回行う
@@ -36,6 +35,7 @@ for t in range(T):
     nn = model.NN(M, H, N)
     params = nn.sampling(Xt, Yt)
     L = np.mean([-np.log(nn0.p(x, y, a0, b0)) for x, y in XYv])
+    Ln = np.mean([-np.log(nn0.p(x, y, a0, b0)) for x, y in XYt])
     T = np.mean([-np.log(p(x, y)) for x, y in XYt])
     G = np.mean([-np.log(p(x, y)) for x, y in XYv])
     AIC = T + nn.d / n
@@ -60,5 +60,5 @@ for t in range(T):
     DIC1 = T + Deff1 / n
     DIC2 = T + Deff2 / n
     print(
-        f'G={G-L:.3g}, AIC={AIC-L:.3g}, WAIC={WAIC-L:.3g}, DIC1={DIC1-L:.3g}, DIC2={DIC2-L:.3g}'
+        f'G={G-L:.3g}, T={T-Ln:.3g}, AIC={AIC-Ln:.3g}, WAIC={WAIC-Ln:.3g}, DIC1={DIC1-Ln:.3g}, DIC2={DIC2-Ln:.3g}'
     )
