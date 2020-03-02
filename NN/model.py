@@ -1,7 +1,6 @@
 import numpy as np
 from scipy import stats
 from copy import deepcopy
-import tqdm
 
 
 class NN():
@@ -60,15 +59,13 @@ class NN():
         sample = []
         a = np.random.normal(0, 1, (self.H, self.N))
         b = np.random.normal(0, 1, (self.H, self.M))
-        print('now sampling...')
-        for _ in tqdm.tqdm(range(size)):
+        for _ in range(size):
             ga = np.random.normal(0, (2 * eps)**0.5, (self.H, self.N))
             gb = np.random.normal(0, (2 * eps)**0.5, (self.H, self.M))
             dfa, dfb = self.df(a, b, X, Y)
             a = a - eps * dfa + ga
             b = b - eps * dfb + gb
             sample.append((a, b))
-        print('done!')
         return sample[burn:]
 
     def generate(self, a, b):
