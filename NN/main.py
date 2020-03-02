@@ -1,26 +1,22 @@
-import model
 import numpy as np
+import model
+import criteria
 
-# 設定
-M, H0, N = 3, 3, 2
-H = 3
-n = 50
-T = 1
-a0 = np.random.normal(0, 1, (H0, N))
-b0 = np.random.normal(0, 1, (H0, M))
+M = 3  # 入力次元
+N = 2  # 出力次元
+H0 = 1  # 真の隠れユニット数
+H = 3  # モデルの隠れユニット数
+n = 100  # サンプル数
+T = 5  # 実験の回数
+size = 400  # MCMCの遷移回数
+burn = 100  # サンプルの最初何個捨てるか
 
+# a0 = np.random.normal(0, 1, (H0, N))
+# b0 = np.random.normal(0, 1, (H0, M))
+a0 = np.ones((H0, N))
+b0 = np.ones((H0, M))
 
-# 予測分布
-def p(x, y):
-    return np.mean([nn.p(x, y, a, b) for a, b in params])
-
-
-# 予測関数
-def R(x):
-    return np.mean([nn.R(x, a, b) for a, b in params], axis=0)
-
-
-# 独立した実験をT回行う
+# 学習とモデルの評価
 for t in range(T):
     # データ生成
     nn0 = model.NN(M, H0, N)
@@ -31,34 +27,20 @@ for t in range(T):
     Yt = [xy[1] for xy in XYt]
     Yv = [xy[1] for xy in XYv]
 
-    # 損失の計算
+    # MCMC
     nn = model.NN(M, H, N)
-    params = nn.sampling(Xt, Yt)
-    L = np.mean([-np.log(nn0.p(x, y, a0, b0)) for x, y in XYv])
-    Ln = np.mean([-np.log(nn0.p(x, y, a0, b0)) for x, y in XYt])
-    T = np.mean([-np.log(p(x, y)) for x, y in XYt])
-    G = np.mean([-np.log(p(x, y)) for x, y in XYv])
-    AIC = T + nn.d / n
-    V = np.sum([
-        np.mean([np.log(nn.p(x, y, a, b))**2 for a, b in params]) -
-        np.mean([np.log(nn.p(x, y, a, b)) for a, b in params])**2
-        for x, y in XYt
-    ])
-    WAIC = T + V / n
-    am = np.mean([a for a, b in params], axis=0)
-    bm = np.mean([b for a, b in params], axis=0)
-    Deff1 = 2 * np.mean([
-        np.log(nn.p(x, y, am, bm)) -
-        np.mean([np.log(nn.p(x, y, a, b)) for a, b in params]) for x, y in XYt
-    ])
-    Deff2 = 2 * (np.mean([
-        np.sum([np.log(nn.p(x, y, a, b)) for x, y in XYt])**2
-        for a, b in params
-    ]) - np.mean([
-        np.sum([np.log(nn.p(x, y, a, b)) for x, y in XYt]) for a, b in params
-    ])**2)
-    DIC1 = T + Deff1 / n
-    DIC2 = T + Deff2 / n
+    params = nn.sampling(Xt, Yt, size=size, burn=burn)
+
+    # 各種規準の計算
+    crt = criteria.Criteria(nn, nn0, XYt, XYv, params, (a0, b0))
+    L = crt.L
+    Ln = crt.Ln
+    G = crt.G
+    T = crt.T
+    AIC = crt.AIC
+    WAIC = crt.WAIC
+    DIC1 = crt.DIC1
+    DIC2 = crt.DIC2
     print(
-        f'G={G-L:.3g}, T={T-Ln:.3g}, AIC={AIC-Ln:.3g}, WAIC={WAIC-Ln:.3g}, DIC1={DIC1-Ln:.3g}, DIC2={DIC2-Ln:.3g}'
+        f'G={G:.3g}, T={T:.3g}, AIC={AIC:.3g},WAIC={WAIC:.3g}, DIC1={DIC1:.3g}, DIC2={DIC2:.3g}'
     )
