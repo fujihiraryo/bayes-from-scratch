@@ -25,6 +25,7 @@ class Criteria():
         self.Deff2 = self.calcDeff2()
         self.DIC1 = self.calcDIC1()
         self.DIC2 = self.calcDIC2()
+        self.CV = self.calcCV()
 
     def predict(self, x, y):
         # 予測分布
@@ -113,3 +114,12 @@ class Criteria():
 
     def calcDIC2(self):
         return self.T + self.Deff2 / self.n
+
+    def calcCV(self):
+        res = 0
+        for x, y in self.train_data:
+            tmp = 0
+            for a, b in self.params:
+                tmp += self.model.p(x, y, a, b)**(-1)
+            res += np.log(tmp / self.m)
+        return res / self.n
