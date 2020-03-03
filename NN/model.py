@@ -16,13 +16,17 @@ class NN():
 
     def activate(self, x):
         # 活性化関数
-        return 1 / (1 + np.exp(-x))
-        # return max(x, 0)
+        if x > 50:
+            return 1
+        elif x < -50:
+            return 0
+        else:
+            return 1 / (1 + np.exp(-x))
 
     def R(self, x, a, b):
         return np.array([
             sum([
-                a[h][j] / self.activate((b[h] * x).sum())
+                a[h][j] * self.activate((b[h] * x).sum())
                 for h in range(self.H)
             ]) for j in range(self.N)
         ])
