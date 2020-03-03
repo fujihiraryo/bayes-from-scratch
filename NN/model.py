@@ -14,10 +14,15 @@ class NN():
         self.s = s
         self.d = (M + N) * H
 
+    def activate(self, x):
+        # 活性化関数
+        return 1 / (1 + np.exp(-x))
+        # return max(x, 0)
+
     def R(self, x, a, b):
         return np.array([
             sum([
-                a[h][j] / (1 + np.exp(-(b[h] * x).sum()))
+                a[h][j] / self.activate((b[h] * x).sum())
                 for h in range(self.H)
             ]) for j in range(self.N)
         ])
