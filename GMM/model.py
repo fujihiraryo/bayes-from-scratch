@@ -1,6 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.special import psi
+from scipy import stats
 
 
 class GMM():
@@ -10,10 +10,10 @@ class GMM():
         self.phi = np.ones(K)
         self.mu = np.random.normal(0, 0.1, (K, N))
         self.tau = np.ones(K)
+        self.d = (K - 1) + K * N
 
     def gauss(self, x, mu, tau):
-        return (tau / (2 * np.pi))**(self.N / 2) * np.exp(-(tau / 2) *
-                                                          ((x - mu)**2).sum())
+        return stats.multivariate_normal(mu, (tau)**(-0.5)).pdf(x)
 
     def p(self, x, a, b):
         return sum([
@@ -53,3 +53,7 @@ class GMM():
             for k in range(self.K)
         ])
         return a, b
+
+    def data_sampling(self, a, b):
+        k = np.random.choice(self.K, p=a)
+        return np.random.multivariate_normal(b[k], np.identity(self.N))

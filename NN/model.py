@@ -83,4 +83,4 @@ class NN():
                                           self.sx * np.identity(self.M))
         y = np.random.multivariate_normal(self.R(x, a, b),
                                           self.s * np.identity(self.N))
-        return (x, y)
+        return x, y
