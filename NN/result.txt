@@ -1,0 +1,11 @@
+G mean=0.166 std=0.096
+AIC mean=0.269 std=0.085
+WAIC mean=0.211 std=0.101
+DIC1 mean=0.090 std=0.085
+DIC2 mean=1.515 std=1.670
+CV mean=0.209 std=0.100
+AIC 1.905
+WAIC 1.240
+DIC1 1.415
+DIC2 455.032
+CV 1.211
