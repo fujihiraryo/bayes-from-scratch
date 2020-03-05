@@ -1,6 +1,8 @@
 import numpy as np
 from scipy import stats
 from copy import deepcopy
+import pylog
+logger = pylog.setup_logger()
 
 
 class NN():
@@ -75,6 +77,8 @@ class NN():
             a = a - eps * dfa + ga
             b = b - eps * dfb + gb
             sample.append((a, b))
+            # logger.debug('sampling:[{}/{}], a={}, b={}'.format(
+            #     _ + 1, size, a, b))
         return sample[burn:]
 
     def generate(self, a, b):

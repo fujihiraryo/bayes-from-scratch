@@ -3,12 +3,14 @@ import pandas as pd
 
 import model
 import criteria
+import pylog
+logger = pylog.setup_logger()
 
 M = 3  # 入力次元
 N = 3  # 出力次元
 H0 = 1  # 真の隠れユニット数
 H = 3  # モデルの隠れユニット数
-n = 200  # サンプル数
+n = 100  # サンプル数
 T = 100  # 実験の回数
 size = 100  # MCMCの遷移回数
 burn = 20  # サンプルの最初何個捨てるか
@@ -44,7 +46,7 @@ for t in range(T):
     DIC1 = crt.DIC1
     DIC2 = crt.DIC2
     CV = crt.CV
-    print(
+    logger.info(
         f'loss={G-L:.3g}, AIC={AIC-Ln:.3g},WAIC={WAIC-Ln:.3g}, DIC1={DIC1-Ln:.3g}, DIC2={DIC2-Ln:.3g}, CV={CV-Ln:.3g}'
     )
     result['G'].append(G - L)
