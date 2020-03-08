@@ -37,7 +37,7 @@ class NN():
             (y - self.R(x, a, b))**2).sum() for x, y in XY]) / (2 * self.s**2)
 
     def df(self, a, b, X, Y):
-        # Hのa,bに関する数値微分
+        # fのa,bに関する数値微分
         eps = 0.0001
         dfa = np.zeros_like(a)
         dfb = np.zeros_like(b)
