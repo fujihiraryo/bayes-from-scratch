@@ -51,7 +51,7 @@ class NN():
             for m in range(self.M):
                 db = np.zeros_like(b)
                 db[h][m] = eps
-                dfb[h][n] = (self.f(a, b + db, X, Y) -
+                dfb[h][m] = (self.f(a, b + db, X, Y) -
                              self.f(a, b - db, X, Y)) / (2 * eps)
         return dfa, dfb
 
@@ -83,4 +83,4 @@ class NN():
                                           self.sx * np.identity(self.M))
         y = np.random.multivariate_normal(self.R(x, a, b),
                                           self.s * np.identity(self.N))
-        return (x, y)
+        return x, y

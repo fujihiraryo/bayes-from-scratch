@@ -1,4 +1,7 @@
 */__pycache__/*
 tempCodeRunnerFile.py
-test.py
+test.*
 .env
+run.sh
+log/*
+.vscode/*
